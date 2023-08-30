@@ -39,21 +39,16 @@ def assign_side():
 
 # Toggles turn back and forth
 def toggle_turn():
-    if game_state["current_turn"] == 1:
-        game_state["current_turn"] = -1
-    else:
-        game_state["current_turn"] = 1
+    game_state["current_turn"] = game_state["current_turn"]*-1
 
 
 # Is the main running function in game_manager
-def run_game():
-    global board 
+def run_game(board):
     engine_side = CGBot(assign_side(), game_state["board"])
     user_side = UserBot(-engine_side.my_piece, game_state["board"])
     winner = None
-    game_over()
 
-    while True:
+    while winner is None:
         if engine_side.my_piece == game_state["current_turn"]:
             engine_side.activate()
             game_state["board"] = board
@@ -68,9 +63,13 @@ def run_game():
 
         display()
         toggle_turn()
-        game_over()
+        winner = game_over()
 
         input("enter to continue...")
+
+        if winner is not None:
+            print(winner)
+            break
 
     
 
@@ -210,12 +209,14 @@ def update_board(board, ganh_remove=None, chet_remove=None):
     else:
         pass
 
-def game_over():
-    if not get_position(1) or not get_position(-1):
-        return False
 
+def game_over():
+    if not get_position(1): 
+        return "red wins"
+    elif not get_position(-1):
+        return "blue wins"
     else:
-        return True
+        return None
 
 
 # Get positions of required color
@@ -235,6 +236,6 @@ game_state = {
 
 
 if __name__ == "__main__":
-    run_game()
+    run_game(board)
 
 
