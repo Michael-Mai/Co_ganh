@@ -1,9 +1,18 @@
-from flask import Flask, request, render_template
+from flask import Flask, flash, request, redirect, url_for, render_template
 import subprocess
-from PIL import Image, ImageDraw
 import os
+from werkzeug.utils import secure_filename
+
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
+
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "botfiles")
+ALLOWED_EXTENSIONS = {'py'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+    filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def index():
@@ -13,48 +22,24 @@ def index():
 def submit_bot():
 
     if 'file' not in request.files:
-        return "chưa có file đính kèm"
+        flash("chưa có file đính kèm")
+        return redirect(request.base_url)
     
     file = request.files['file']
     if file.filename == '':
-        return "không có file"
+        flash("không có file")
+        return redirect(request.base_url)
     
-    if file:
-        current_path = os.getcwd()
-        submit_path = os.path.join(current_path, "botfiles")
-        submit_file = os.path.join(submit_path, "bot.py")
-        file.save(submit_file)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config[UPLOAD_FOLDER], filename))
 
         result = subprocess.run(['python', 'bot.py'], capture_output=True, text=True)
-
         return render_template('result.html', output=result.stdout)
-    
-@app.route('/game', methods=['POST'])
-def board_to_image():
-    pass
+
 
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
 
 
-
-board = [
-    [-1, -1, -1, -1, -1],
-    [-1,  0,  0,  0, -1],
-    [ 1,  0,  0,  0, -1],
-    [ 1,  0,  0,  0,  1],
-    [ 1,  1,  1,  1,  1]
-]
-
-
-
-def move_assess(board):
-    pass
-
-
-def bot():
-    pass
-
-def valid_move():
-    pass
