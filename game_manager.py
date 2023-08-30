@@ -71,10 +71,6 @@ def run_game(board):
             print(winner)
             break
 
-    
-
-
-
 
 def ganh(piece, opp_piece, board):
     valid_remove = []
