@@ -8,20 +8,12 @@ import random
 
 
 
-#board = [
-#    [-1, -1, -1, -1, -1],
-#    [-1,  0,  0,  0, -1],
-#    [ 1,  0,  0,  0, -1],
-#    [ 1,  0,  0,  0,  1],
-#    [ 1,  1,  1,  1,  1]
-#]
-
 board = [
-    [1, 0, 0, 1, 0],
-    [0,  0,  0,  1, 0],
-    [0,  -1,  0,  -1, 0],
-    [0,  0,  0,  1,  0],
-    [0,  0,  -1,  0,  0]
+    [-1, -1, -1, -1, -1],
+    [-1,  0,  0,  0, -1],
+    [ 1,  0,  0,  0, -1],
+    [ 1,  0,  0,  0,  1],
+    [ 1,  1,  1,  1,  1]
 ]
 
 diag_pos = [(1,1), (1, 3), (3,1), (3,3)]
@@ -53,11 +45,15 @@ def toggle_turn():
 # Is the main running function in game_manager
 def run_game(board):
     engine_side = CGBot(assign_side(), game_state["board"])
+    user_side = UserBot(-engine_side.my_piece, game_state["board"])
     winner = None
 
     while winner is None:
         if engine_side.my_piece == game_state["current_turn"]:
             engine_side.activate()
+            game_state["board"] = board
+        elif user_side.my_piece == game_state["current_turn"]:
+            board = user_side.activate()
             game_state["board"] = board
         else:
             pass
