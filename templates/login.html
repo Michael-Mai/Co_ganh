@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>Đăng nhập</h1>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        {{ form.username }}
+        {{ form.password }}
+        {{ form.submit  }}
+    </form>
+    <a href="{{url_for("register")}}">Chưa có tài khoản? Đăng ký tại đây</a>
+</body>
+
+</html>

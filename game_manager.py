@@ -1,5 +1,20 @@
+import importlib.util
+import sys
+import os
+from PIL import Image, ImageDraw
+from appcg import session
+current_username = session['username']
+cwd_botfile = os.path.join(os.getcwd(), f'botfile_{current_username}.py')
+spec = importlib.util.spec_from_file_location("UserBot", cwd_botfile)
+foo = importlib.util.module_from_spec(spec)
+sys.modules['UserBot'] = foo
+spec.loader.exec_module(foo)
+foo.UserBot()
+
+import re
 from CGEngine import CGBot
-from bot1 import UserBot
+
+from static.botfiles.bot1 import UserBot
 import random
 
 #               ----READ ME PLS----
@@ -15,7 +30,6 @@ board = [
     [ 1,  0,  0,  0,  1],
     [ 1,  1,  1,  1,  1]
 ]
-
 diag_pos = [(1,1), (1, 3), (3,1), (3,3)]
 
 # Loops through board and gives locations of red and blue
@@ -44,16 +58,24 @@ def toggle_turn():
 
 # Is the main running function in game_manager
 def run_game(board):
-    engine_side = CGBot(assign_side(), game_state["board"])
-    user_side = UserBot(-engine_side.my_piece, game_state["board"])
+    player1 = CGBot(assign_side(), game_state["board"])
+    player2 = UserBot(-player1.my_piece, game_state["board"])
     winner = None
+    move = 1
+    del_all_img()
 
     while winner is None:
-        if engine_side.my_piece == game_state["current_turn"]:
-            engine_side.activate()
+        
+        input_console = input("enter to continue...")
+
+        if input_console == "del":
+            del_all_img()
+
+        if player1.my_piece == game_state["current_turn"]:
+            player1.activate()
             game_state["board"] = board
-        elif user_side.my_piece == game_state["current_turn"]:
-            board = user_side.activate()
+        elif player2.my_piece == game_state["current_turn"]:
+            board = player2.activate()
             game_state["board"] = board
         else:
             pass
@@ -62,18 +84,34 @@ def run_game(board):
         chet_remove = chet(game_state["current_turn"], -game_state["current_turn"], game_state["board"])
 
         update_board(game_state["board"], ganh_remove, chet_remove)
+        generate_image(game_state["board"], move)
 
         print("AFTER: \n----------")
         display()
         print("----------")
         toggle_turn()
         winner = game_over()
-
-        input("enter to continue...")
-
+        move += 1
+        
         if winner is not None:
             print(winner)
             break
+    
+    
+def del_all_img():
+    try:
+        cwd = os.getcwd() #Get current directory
+        img_dir = cwd + "/static/upload_video"
+        images = os.listdir(img_dir)
+        for file in images:
+            file_path = os.path.join(img_dir, file)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        print("deletion successful")
+    except OSError:
+        print("OS error")
+
+
 
 
 def ganh(piece, opp_piece, board):
@@ -225,6 +263,8 @@ def game_over():
         return "red wins"
     elif not get_position(-1):
         return "blue wins"
+    elif len(get_position(1)) == 1 and len(get_position(-1)) == 1:
+        return "Tie"
     else:
         return None
 
@@ -239,11 +279,67 @@ def get_position(color):
     return positions
 
 
+def generate_video():
+    cwd = os.getcwd()
+    img_dir = cwd + "/static/upload_video/"
+    out_vid_dir = cwd + "/cg-replay/"
+    out_vid_name = "cg-replay.mp4"
+    vid_path = out_vid_dir + out_vid_name
+
+    images = os.listdir(img_dir)
+    img_list = []
+
+    for file in images:
+        re.compiler
+
+
+def generate_image(board, move):
+    image = Image.new("RGB", (600, 600), "WHITE")
+    draw = ImageDraw.Draw(image)
+
+    draw.line((100, 100, 500, 100), fill="black", width=3)
+    draw.line((100, 200, 500, 200), fill="black", width=3)
+    draw.line((100, 300, 500, 300), fill="black", width=3)
+    draw.line((100, 400, 500, 400), fill="black", width=3)
+    draw.line((100, 500, 500, 500), fill="black", width=3)
+    draw.line((100, 100, 100, 500), fill="black", width=3)
+
+    draw.line((200, 100, 200, 500), fill="black", width=3)
+    draw.line((300, 100, 300, 500), fill="black", width=3)
+    draw.line((400, 100, 400, 500), fill="black", width=3)
+    draw.line((500, 100, 500, 500), fill="black", width=3)
+    draw.line((100, 100, 500, 500), fill="black", width=3)
+    draw.line((100, 500, 500, 100), fill="black", width=3)
+
+    draw.line((100, 300, 300, 100), fill="black", width=3)
+    draw.line((300, 100, 500, 300), fill="black", width=3)
+    draw.line((500, 300, 300, 500), fill="black", width=3)
+    draw.line((300, 500, 100, 300), fill="black", width=3)
+
+    x = 80
+    y = 80 
+    for row in range(len(board)):
+        for column in range(len(board[0])):
+            if board[row][column] == -1:
+                draw.ellipse((x, y, x + 40, y + 40), fill="red", outline="red")
+            elif board[row][column] == 1:
+                draw.ellipse((x, y, x + 40, y + 40), fill="blue", outline="blue")
+            else:
+                pass
+            x = x + 100
+        x = 80
+        y = y + 100
+
+    cwd = os.getcwd()
+    img_dir = cwd + "/static/upload_video"
+
+    image.save(f"{img_dir}/chessboard{move}.png", "PNG")
+
+
 game_state = {
             "board": board,
             "current_turn": 1
 }
-
 
 if __name__ == "__main__":
     run_game(board)

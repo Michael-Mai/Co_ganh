@@ -11,13 +11,7 @@ import random
 #def board_to_image():
 #    pass
 
-
-
-diag_pos = [(1,1), (1, 3), (3,1), (3,3)]
-
-
-
-
+diag_pos = [(1,1), (1, 3), (3,1), (3,3)] 
 
 class CGBot:
     def __init__(self, side, board):
@@ -148,17 +142,6 @@ class CGBot:
             "board": board
         }
         
-        #   Sample_move = {
-        #       "piece": {
-        #           "x": 2,
-        #           "y": 0
-        #       },
-        #       "new_pos": {
-        #           "x": 2,
-        #           "y": 1
-        #       }
-        #   }
-
         move = False
 
         move = self.main(my_input)
