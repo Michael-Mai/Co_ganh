@@ -8,9 +8,9 @@
     <h1 style="text-align: center;">Cờ gánh</h1>
     <h2>Đăng bot</h2>
     <form method="POST" action="/submit" enctype="multipart/form-data">
-      <input type="file" name="file">
-      <input type="submit" value="Đăng code">
-      <input type="submit" value="Đấu Người">
+      <input type="file" name="file" value="chọn file">
+      <input type="submit" name="match_bot" value="Đấu với bot hệ thống">
+      <input type="submit" name="match_player" value="Đấu với bot của người chơi">
     </form><br>
       {% with messages = get_flashed_messages() %}
     {% if messages %}

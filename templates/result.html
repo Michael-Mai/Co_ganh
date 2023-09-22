@@ -1,7 +1,78 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Image Gallery</title>
+        <style>
+            #image-container {
+                text-align: center;
+            }
+            #gallery-image {
+                max-width: 100%;
+                max-height: 80vh; /* Limit image height to 80% of viewport height */
+            }
+            .nav-button {
+                cursor: pointer;
+                font-size: 24px;
+                margin: 10px;
+                text-align: center;
+            }
+        </style>
+    </head>
     <body>
-        <h2>Bot của bạn đã được đăng và đang trong quá trình thử nghiệm!</h2>
+        <div id="image-container">
+            <img id="gallery-image" src="" alt="ImageCG">
+        </div>
+    
+        <!-- Navigation buttons -->
+        <div>
+            <span class="nav-button" id="prev-button">&#9664;</span>
+            <span class="nav-button" id="next-button">&#9654;</span>
+        </div>
+
+
+<script>
+    const imageContainer = document.getElementById("image-container");
+    const galleryImage = document.getElementById("gallery-image");
+    const prevButton = document.getElementById("prev-button");
+    const nextButton = document.getElementById("next-button");
+    let imageFiles = []; 
+
+    let currentIndex = 0;
+
+    function showImage(index) {
+        if (index >= 0 && index < imageFiles.length) {
+            galleryImage.src = "{{ url_for('static', filename='upload_img/') }}" + imageFiles[index];
+            galleryImage.alt = `Image ${index + 1}`;
+        }
+    }
+
+    prevButton.addEventListener("click", () => {
+        currentIndex = (currentIndex - 1 + imageFiles.length) % imageFiles.length;
+        showImage(currentIndex);
+    });
+
+
+    nextButton.addEventListener("click", () => {
+        currentIndex = (currentIndex + 1) % imageFiles.length;
+        showImage(currentIndex);
+    });
+
+    fetch("/image_list")
+        .then(response => response.json())
+        .then(data => {
+            // Sort the filenames numerically
+            imageFiles = data.sort((a, b) => {
+                // Extract numeric parts from filenames
+                const numericA = parseInt(a.match(/\d+/)[0], 10);
+                const numericB = parseInt(b.match(/\d+/)[0], 10);
+                return numericA - numericB;
+            });
+            showImage(0);
+        });
+</script>
+
         <a href='{{ url_for('menu') }}'>Quay lại</a>
     </body>
 </html>
