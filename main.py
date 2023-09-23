@@ -3,14 +3,14 @@ import os
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask_wtf import FlaskForm, CSRFProtect
+from flask_wtf import FlaskForm 
 from wtforms import SubmitField, PasswordField, StringField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
 from game_manager import activation, del_all_img
 
 
-
+del_all_img()
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] =\
@@ -21,8 +21,6 @@ app.app_context().push()
 #Flask Alchemy initialization
 bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
-
-csrf = CSRFProtect(app)
 
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 100  #Max file size
 app.config['UPLOAD_FOLDER'] = "static/botfiles"
@@ -144,9 +142,10 @@ def submit_bot():
 
     if request.method == "POST":
         del_all_img()
-        if request.form.get("match_bot") == "Đăng code":
+        if request.form.get("match_bot") == "Đấu với bot hệ thống":
             activation("bot", session["username"])
-        if request.form.get("match_player") == "Đấu Người":
+    
+        if request.form.get("match_player") == "Đấu với bot của người chơi":
             activation("player", session["username"])
     
         img_folder = 'static/upload_img'

@@ -21,6 +21,7 @@
         </style>
     </head>
     <body>
+        <span id="move-counter" style="text-align: center;">Nước đi: 0</span>
         <div id="image-container">
             <img id="gallery-image" src="" alt="ImageCG">
         </div>
@@ -32,14 +33,18 @@
         </div>
 
 
-<script>
+<script lang="JavaScript">
     const imageContainer = document.getElementById("image-container");
     const galleryImage = document.getElementById("gallery-image");
     const prevButton = document.getElementById("prev-button");
     const nextButton = document.getElementById("next-button");
+    const moveCountEl = document.getElementById("move-counter")
+
     let imageFiles = []; 
 
     let currentIndex = 0;
+    let moveCount = 0
+
 
     function showImage(index) {
         if (index >= 0 && index < imageFiles.length) {
@@ -48,16 +53,31 @@
         }
     }
 
+    
+    function showMoveCount(move) {
+        moveCount += move;
+        if (moveCount == 201) {
+            moveCount = 0;
+        } else if (moveCount < 0) {
+            moveCount = 200
+        }
+        moveCountEl.textContent= `Nước đi: ${moveCount}` ;
+    }
+
+
     prevButton.addEventListener("click", () => {
         currentIndex = (currentIndex - 1 + imageFiles.length) % imageFiles.length;
         showImage(currentIndex);
+        showMoveCount(-1)
     });
 
 
     nextButton.addEventListener("click", () => {
         currentIndex = (currentIndex + 1) % imageFiles.length;
         showImage(currentIndex);
+        showMoveCount(1)
     });
+
 
     fetch("/image_list")
         .then(response => response.json())
